@@ -2,9 +2,10 @@ from recombee_api_client.api_client import RecombeeClient, Region
 from recombee_api_client.exceptions import APIException
 from recombee_api_client.api_requests import *
 import csv
+import os
+from dotenv import load_dotenv
 
-database_id = 'lab-dev'
-token = ''
+load_dotenv()
 
 columns = {
     "title": "string",
@@ -35,6 +36,7 @@ def set_item_properties(client, properties):
     for col in properties:
         client.send(AddItemProperty(col, properties[col]))
 
+
 def parse_csv(csv_file, columns):
     parsed_rows = []
     with open(csv_file, newline='', encoding='utf-8') as csvfile:
@@ -60,7 +62,8 @@ def parse_csv(csv_file, columns):
 
 
 if __name__ == "__main__":
-
+    database_id = os.getenv("DATABASE_ID")
+    token = os.getenv("API_TOKEN")
 
     client = init_client(database_id, token)
     data = parse_csv("dataset.csv", columns)
@@ -72,5 +75,5 @@ if __name__ == "__main__":
     for i, item in enumerate(data):
         item_id = str(i)
         client.send(AddItem(item_id))
-
-
+        client.send(SetItemValues(item_id, item))
+        print(item_id)
