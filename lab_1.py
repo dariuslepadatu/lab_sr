@@ -32,9 +32,39 @@ def init_client(database_id, token):
     return client
 
 
-def set_item_properties(client, properties):
-    for col in properties:
-        client.send(AddItemProperty(col, properties[col]))
+def add_item_properties(client, properties):
+    try:
+        for col in properties:
+            client.send(AddItemProperty(col, properties[col]))
+    except APIException as e:
+        print(e)
+
+def delete_item_properties(client, properties):
+    try:
+        for col in properties:
+            client.send(DeleteItemProperty(col))
+    except APIException as e:
+        print(e)
+
+def add_items(client, data):
+    try:
+        for i, item in enumerate(data):
+            item_id = str(i)
+            client.send(AddItem(item_id))
+            client.send(SetItemValues(item_id, item))
+            print(item_id)
+    except APIException as e:
+        print(e)
+
+
+def delete_items(client, data):
+    try:
+        for i, item in enumerate(data):
+            item_id = str(i)
+            client.send(DeleteItem(item_id))
+            print(item_id)
+    except APIException as e:
+        print(e)
 
 
 def parse_csv(csv_file, columns):
@@ -68,12 +98,10 @@ if __name__ == "__main__":
     client = init_client(database_id, token)
     data = parse_csv("dataset.csv", columns)
 
+    add_item_properties(client, columns)
 
-    # set_item_properties(client, columns)
+    # delete_item_properties(client, columns)
 
+    add_items(client, data)
 
-    for i, item in enumerate(data):
-        item_id = str(i)
-        client.send(AddItem(item_id))
-        client.send(SetItemValues(item_id, item))
-        print(item_id)
+    # delete_items(client, data)
