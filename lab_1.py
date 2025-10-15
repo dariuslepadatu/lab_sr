@@ -64,10 +64,9 @@ def add_items(client, data):
         print(e)
 
 
-def delete_items(client, data):
+def delete_items(client, items_ids):
     try:
-        for i, item in enumerate(data):
-            item_id = str(i)
+        for item_id in items_ids:
             client.send(DeleteItem(item_id))
             print(item_id)
     except APIException as e:
@@ -93,11 +92,12 @@ def add_users(client, data):
         print(e)
 
 
-def delete_users(client, data):
+def delete_users(client, users_ids):
     try:
-        for i, user in enumerate(data):
-            user_id = str(i)
+        for user_id in users_ids:
             client.send(DeleteUser(user_id))
+            print(user_id)
+
     except APIException as e:
         print(e)
 
@@ -138,11 +138,12 @@ if __name__ == "__main__":
 
     # add_items(client, data)
 
-    # delete_items(client, data)
+    # delete_items(client, range(len(data)))
 
     users = parse_csv("people.csv", user_columns)
 
-    add_user_properties(client, user_columns)
+    # add_user_properties(client, user_columns)
     add_users(client, users)
-    # delete_users(client, users)
+
+    # delete_users(client, range(len(users)))
 
