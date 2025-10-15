@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-columns = {
+dataset_columns = {
     "title": "string",
     "fulltitle": "string",
     "description": "string",
@@ -21,6 +21,13 @@ columns = {
     "channel": "string",
     "channel_url": "string",
     "channel_follower_count": "int"
+}
+
+user_columns = {
+    "Person": "string",
+    "PID": "string",
+    "Team": "string",
+    "Location": "string",
 }
 
 def init_client(database_id, token):
@@ -67,9 +74,36 @@ def delete_items(client, data):
         print(e)
 
 
+def add_user_properties(client, properties):
+    try:
+        for col in properties:
+            client.send(AddUserProperty(col, properties[col]))
+    except APIException as e:
+        print(e)
+
+
+def add_users(client, data):
+    try:
+        for i, user in enumerate(data):
+            user_id = str(i)
+            print(user_id, user)
+            client.send(AddUser(user_id))
+            client.send(SetUserValues(user_id, user))
+    except APIException as e:
+        print(e)
+
+
+def delete_users(client, data):
+    try:
+        for i, user in enumerate(data):
+            user_id = str(i)
+            client.send(DeleteUser(user_id))
+    except APIException as e:
+        print(e)
+
 def parse_csv(csv_file, columns):
     parsed_rows = []
-    with open(csv_file, newline='', encoding='utf-8') as csvfile:
+    with open(csv_file, newline='', encoding='utf-8-sig') as csvfile:
         reader = csv.DictReader(csvfile)
 
         for row in reader:
@@ -96,12 +130,19 @@ if __name__ == "__main__":
     token = os.getenv("API_TOKEN")
 
     client = init_client(database_id, token)
-    data = parse_csv("dataset.csv", columns)
+    data = parse_csv("dataset.csv", dataset_columns)
 
-    add_item_properties(client, columns)
+    add_item_properties(client, dataset_columns)
 
-    # delete_item_properties(client, columns)
+    # delete_item_properties(client, dataset_columns)
 
-    add_items(client, data)
+    # add_items(client, data)
 
     # delete_items(client, data)
+
+    users = parse_csv("people.csv", user_columns)
+
+    add_user_properties(client, user_columns)
+    add_users(client, users)
+    # delete_users(client, users)
+
