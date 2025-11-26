@@ -33,21 +33,20 @@ if __name__ == '__main__':
     print("Loaded json")
 
     products = []
-
-    print("Preprocessing text")
     for pd in products_data:
         html = pd.get('description', '')
         raw_text = BeautifulSoup(html, 'html.parser').get_text(" ", strip=True)
         preprocessed_text = preprocess_text(raw_text)
         products.append({'name': pd.get('name', ''), 'id': pd.get('id', ''), 'text': preprocessed_text})
+    print("Preprocessed text")
 
-    print("Vectorizing text")
 
     corpus = [p.get('text', '') for p in products]
 
     # Vectorize all descriptions of products
     vectorizer = TfidfVectorizer()
     tfidf_matrix = vectorizer.fit_transform(corpus)
+    print("Vectorized text")
 
     # Compute similarity matrix
     sim_matrix = cosine_similarity(tfidf_matrix)
