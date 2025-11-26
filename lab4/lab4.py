@@ -33,11 +33,14 @@ if __name__ == '__main__':
     print("Loaded json")
 
     products = []
+    taken_ids = []
     for pd in products_data:
-        html = pd.get('description', '')
-        raw_text = BeautifulSoup(html, 'html.parser').get_text(" ", strip=True)
-        preprocessed_text = preprocess_text(raw_text)
-        products.append({'name': pd.get('name', ''), 'id': pd.get('id', ''), 'text': preprocessed_text})
+        if pd.get('gtin13', '') not in taken_ids:
+            html = pd.get('description', '')
+            raw_text = BeautifulSoup(html, 'html.parser').get_text(" ", strip=True)
+            preprocessed_text = preprocess_text(raw_text)
+            products.append({'name': pd.get('name', ''), 'id': pd.get('gtin13', ''), 'text': preprocessed_text})
+            taken_ids.append(pd.get('gtin13', ''))
     print("Preprocessed text")
 
 
@@ -51,10 +54,11 @@ if __name__ == '__main__':
     # Compute similarity matrix
     sim_matrix = cosine_similarity(tfidf_matrix)
 
-    # Fill the identity diagonal with 1 values in order to remove self comparison
-    np.fill_diagonal(sim_matrix, 1)
+    # Fill the identity diagonal with 0 values in order to remove self comparison
+    np.fill_diagonal(sim_matrix, 0)
+    print(sim_matrix)
 
-    # Find out the lowest cosine similarity
-    i, j = np.unravel_index(sim_matrix.argmin(), sim_matrix.shape)
+    # Find out the cosine similarity
+    i, j = np.unravel_index(sim_matrix.argmax(), sim_matrix.shape)
 
-    print(f"Most similar products: {products[i].get('name', '')} and {products[j].get('name', '')} -> Score {sim_matrix[i, j]:.4f}")
+    print(f"Most similar products: {products[i].get('id', '')} and {products[j].get('id', '')} -> Score {sim_matrix[i, j]:.4f}")
