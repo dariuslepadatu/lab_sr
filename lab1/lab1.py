@@ -80,6 +80,13 @@ def add_user_properties(client, properties):
     except APIException as e:
         print(e)
 
+def delete_user_properties(client, properties):
+    try:
+        for col in properties:
+            client.send(DeleteUserProperty(col))
+    except APIException as e:
+        print(e)
+
 
 def add_users(client, data):
     try:
@@ -130,20 +137,22 @@ if __name__ == "__main__":
     token = os.getenv("API_TOKEN")
 
     client = init_client(database_id, token)
-    data = parse_csv("dataset.csv", dataset_columns)
+    # data = parse_csv("dataset.csv", dataset_columns)
 
-    add_item_properties(client, dataset_columns)
+    # add_item_properties(client, dataset_columns)
 
-    # delete_item_properties(client, dataset_columns)
+    delete_item_properties(client, dataset_columns)
 
     # add_items(client, data)
 
     # delete_items(client, range(len(data)))
 
-    users = parse_csv("people.csv", user_columns)
+    # users = parse_csv("people.csv", user_columns)
 
     # add_user_properties(client, user_columns)
-    add_users(client, users)
+    delete_user_properties(client, user_columns)
+
+    # add_users(client, users)
 
     # delete_users(client, range(len(users)))
 
